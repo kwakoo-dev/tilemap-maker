@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://4wjq3etqdeko"]
+
+[sub_resource type="GDScript" id="GDScript_w5pq8"]
+script/source = "extends Node
+
+func load_chunks(image : Image, chunks_size : Vector2i) -> Chunks:
+	var chunks = Chunks.new()
+	
+	chunks.top_left = get_region_at(image, 0, 0, chunks_size)
+	chunks.top_left = get_region_at(image, 1, 0, chunks_size)
+	chunks.top = get_region_at(image, 2, 0, chunks_size)
+	chunks.top_right = get_region_at(image, 0, 1, chunks_size)
+	chunks.left = get_region_at(image, 1, 1, chunks_size)
+	chunks.center = get_region_at(image, 2, 1, chunks_size)
+	chunks.bottom_left = get_region_at(image, 0, 2, chunks_size)
+	chunks.bottom = get_region_at(image, 1, 2, chunks_size)
+	chunks.bottom_right = get_region_at(image, 2, 2, chunks_size)
+	chunks.out_top_left = get_region_at(image, 3, 0, chunks_size)
+	chunks.out_top_right = get_region_at(image, 4, 0, chunks_size)
+	chunks.out_bottom_left = get_region_at(image, 3, 1, chunks_size)
+	chunks.out_bottom_right = get_region_at(image, 4, 1, chunks_size)
+	return chunks
+
+func get_region_at(image : Image, x : int, y : int, chunks_size : Vector2i) -> Image:
+	var region = Rect2i(x * chunks_size.x, y * chunks_size.y, chunks_size.x, chunks_size.y)
+	return image.get_region(region)
+"
+
+[node name="ChunkLoader" type="Node"]
+script = SubResource("GDScript_w5pq8")
