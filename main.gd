@@ -17,6 +17,10 @@ var right_positions : Array[Vector2i]
 var bottom_left_positions : Array[Vector2i]
 var bottom_positions : Array[Vector2i]
 var bottom_right_positions : Array[Vector2i]
+var out_top_left_positions : Array[Vector2i]
+var out_top_right_positions : Array[Vector2i]
+var out_bottom_left_positions : Array[Vector2i]
+var out_bottom_right_positions : Array[Vector2i]
 
 func _init() -> void:
 	top_left_positions = [
@@ -142,6 +146,9 @@ func _init() -> void:
 		to_image_coords(20, 6),
 		to_image_coords(21, 6),
 		to_image_coords(22, 6),
+		
+		to_image_coords(8, 7),
+		to_image_coords(15, 7),
 	]
 	right_positions = [
 		to_image_coords(1, 1),
@@ -203,7 +210,90 @@ func _init() -> void:
 		to_image_coords(1, 7),
 		to_image_coords(7, 7),
 		to_image_coords(23, 7),
-	
+	]
+	out_top_left_positions = [
+		to_image_coords(3, 1),
+		to_image_coords(5, 1),
+		
+		to_image_coords(9, 1),
+		to_image_coords(13, 1),
+		to_image_coords(15, 1),
+		
+		to_image_coords(3, 3),
+		to_image_coords(5, 3),
+		
+		to_image_coords(19, 3),
+		to_image_coords(23, 3),
+		
+		to_image_coords(9, 5),
+		to_image_coords(13, 5),
+		
+		to_image_coords(9, 7),
+		
+		to_image_coords(21, 7),
+	]
+	out_top_right_positions = [
+		to_image_coords(4, 1),
+		to_image_coords(6, 1),
+		
+		to_image_coords(8, 1),
+		to_image_coords(10, 1),
+		to_image_coords(14, 1),
+		
+		to_image_coords(4, 3),
+		to_image_coords(6, 3),
+		
+		to_image_coords(10, 5),
+		to_image_coords(14, 5),
+		
+		to_image_coords(16, 5),
+		to_image_coords(20, 5),
+		
+		to_image_coords(14, 7),
+		to_image_coords(20, 7),
+	]
+	out_bottom_left_positions = [
+		to_image_coords(9, 0),
+		
+		to_image_coords(19, 0),
+		
+		to_image_coords(3, 2),
+		to_image_coords(5, 2),
+		
+		to_image_coords(9, 2),
+		to_image_coords(13, 2),
+		to_image_coords(23, 2),
+		
+		to_image_coords(3, 4),
+		to_image_coords(5, 4),
+		
+		to_image_coords(21, 4),
+		
+		to_image_coords(9, 6),
+		to_image_coords(13, 6),
+		to_image_coords(15, 6),
+	]
+	out_bottom_right_positions = [
+		to_image_coords(14, 0),
+		
+		to_image_coords(18, 0),
+		
+		to_image_coords(4, 2),
+		to_image_coords(6, 2),
+		
+		to_image_coords(10, 2),
+		to_image_coords(14, 2),
+		
+		to_image_coords(18, 2),
+		
+		to_image_coords(4, 4),
+		to_image_coords(6, 4),
+		
+		to_image_coords(16, 4),
+		
+		to_image_coords(8, 6),
+		to_image_coords(10, 6),
+		to_image_coords(14, 6),
 	]
 
 func _on_button_pressed() -> void:
@@ -215,8 +305,9 @@ func _on_file_dialog_file_selected(path: String) -> void:
 	input_texture = ImageTexture.create_from_image(image)
 	$InputPreview.texture = input_texture
 	$Generate.disabled = false
+	generate()
 
-func _on_generate_pressed() -> void:
+func generate() -> void:
 	var chunks : Chunks = Chunks.get_chunks(Vector2i(chunk_width, chunk_height))
 	var image_format : Image.Format = image.get_format()
 	var output_image : Image = Image.create_empty(tile_columns * chunk_width, tile_rows * chunk_height, false, image_format)
@@ -232,6 +323,11 @@ func _on_generate_pressed() -> void:
 	blit_chunks(output_image, chunks.bottom_left, bottom_left_positions)
 	blit_chunks(output_image, chunks.bottom, bottom_positions)
 	blit_chunks(output_image, chunks.bottom_right, bottom_right_positions)
+	
+	blit_chunks(output_image, chunks.out_top_left, out_top_left_positions)
+	blit_chunks(output_image, chunks.out_top_right, out_top_right_positions)
+	blit_chunks(output_image, chunks.out_bottom_left, out_bottom_left_positions)
+	blit_chunks(output_image, chunks.out_bottom_right, out_bottom_right_positions)
 	
 	$OutputPreview.texture =  ImageTexture.create_from_image(output_image)
 
