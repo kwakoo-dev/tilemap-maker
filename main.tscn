@@ -1,8 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://doh7hste2qr05"]
+[gd_scene load_steps=6 format=3 uid="uid://doh7hste2qr05"]
 
 [ext_resource type="Script" uid="uid://dax1mj4cmpjlw" path="res://main.gd" id="1_ig7tw"]
 
-[node name="Control" type="Control"]
+[sub_resource type="InputEventAction" id="InputEventAction_ig7tw"]
+action = &"open"
+
+[sub_resource type="Shortcut" id="Shortcut_0xm2m"]
+events = [SubResource("InputEventAction_ig7tw")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_0xm2m"]
+action = &"save"
+
+[sub_resource type="Shortcut" id="Shortcut_h2yge"]
+events = [SubResource("InputEventAction_0xm2m")]
+
+[node name="Control" type="Control" node_paths=PackedStringArray("input_preview", "output_preview", "open_file_dialog", "save_file_dialog", "save_file_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,51 +22,65 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ig7tw")
+input_preview = NodePath("MainLayout/VBoxContainer2/InputPreview")
+output_preview = NodePath("MainLayout/VBoxContainer2/OutputPreview")
+open_file_dialog = NodePath("OpenFileDialog")
+save_file_dialog = NodePath("SaveFileDialog")
+save_file_button = NodePath("MainLayout/Buttons/SaveFile")
 
-[node name="InputPreview" type="TextureRect" parent="."]
-texture_filter = 1
-layout_mode = 0
-offset_right = 411.0
-offset_bottom = 284.0
-stretch_mode = 4
-
-[node name="FileDialog" type="FileDialog" parent="."]
+[node name="OpenFileDialog" type="FileDialog" parent="."]
 title = "Open a File"
 ok_button_text = "Open"
 file_mode = 0
 access = 2
-filters = PackedStringArray("*.png,*.jpg,*.jpeg;Image Files;image/png,image/jpeg")
+filters = PackedStringArray("*.png,*.jpg,*.jpeg")
 
-[node name="OpenFile" type="Button" parent="."]
+[node name="SaveFileDialog" type="FileDialog" parent="."]
+auto_translate_mode = 1
+access = 2
+filters = PackedStringArray("*.png")
+
+[node name="MainLayout" type="VBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = -79.0
-offset_bottom = 31.0
-grow_horizontal = 0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Buttons" type="HBoxContainer" parent="MainLayout"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="OpenFile" type="Button" parent="MainLayout/Buttons"]
+layout_mode = 2
+shortcut = SubResource("Shortcut_0xm2m")
 text = "Open file"
 
-[node name="Generate" type="Button" parent="."]
-visible = false
-layout_mode = 0
-offset_left = 974.0
-offset_top = 37.0
-offset_right = 1147.0
-offset_bottom = 68.0
+[node name="SaveFile" type="Button" parent="MainLayout/Buttons"]
+layout_mode = 2
 disabled = true
-text = "Generate Spritesheet"
+shortcut = SubResource("Shortcut_h2yge")
+text = "Save Tilemap"
 
-[node name="OutputPreview" type="TextureRect" parent="."]
+[node name="VBoxContainer2" type="VSplitContainer" parent="MainLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InputPreview" type="TextureRect" parent="MainLayout/VBoxContainer2"]
 texture_filter = 1
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -230.0
-offset_right = 630.0
-grow_vertical = 0
+layout_mode = 2
+size_flags_vertical = 3
 stretch_mode = 4
 
-[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
-[connection signal="pressed" from="OpenFile" to="." method="_on_button_pressed"]
+[node name="OutputPreview" type="TextureRect" parent="MainLayout/VBoxContainer2"]
+texture_filter = 1
+layout_mode = 2
+size_flags_vertical = 3
+stretch_mode = 4
+
+[connection signal="file_selected" from="OpenFileDialog" to="." method="_on_file_dialog_file_selected"]
+[connection signal="file_selected" from="SaveFileDialog" to="." method="_on_save_file_dialog_file_selected"]
+[connection signal="pressed" from="MainLayout/Buttons/OpenFile" to="." method="_on_open_file_button_pressed"]
+[connection signal="pressed" from="MainLayout/Buttons/SaveFile" to="." method="_on_save_file_pressed"]

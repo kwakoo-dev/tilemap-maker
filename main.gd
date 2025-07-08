@@ -1,6 +1,13 @@
 extends Control
 
+@export var input_preview : TextureRect
+@export var output_preview : TextureRect
+@export var open_file_dialog : FileDialog
+@export var save_file_dialog : FileDialog
+@export var save_file_button : Button
+
 var image : Image
+var output_image : Image
 var input_texture : ImageTexture
 
 var chunk_width : int = 8
@@ -22,7 +29,7 @@ var out_top_right_positions : Array[Vector2i]
 var out_bottom_left_positions : Array[Vector2i]
 var out_bottom_right_positions : Array[Vector2i]
 
-func _init() -> void:
+func recalculate_output_chunk_positions() -> void:
 	top_left_positions = [
 		to_image_coords(0, 0),
 		to_image_coords(2, 0),
@@ -296,21 +303,30 @@ func _init() -> void:
 		to_image_coords(14, 6),
 	]
 
-func _on_button_pressed() -> void:
-	$FileDialog.popup_centered_ratio()
+func _on_open_file_button_pressed() -> void:
+	open_file_dialog.popup_centered_ratio()
 
 func _on_file_dialog_file_selected(path: String) -> void:
 	image = Image.new()
 	image.load(path)
 	input_texture = ImageTexture.create_from_image(image)
-	$InputPreview.texture = input_texture
-	$Generate.disabled = false
+	input_preview.texture = input_texture
+	
+	chunk_width = image.get_width() / 5
+	chunk_height = image.get_height() / 3
+	
+	var file_extension : String = path.get_extension()
+	save_file_dialog.clear_filters()
+	save_file_dialog.add_filter("*." + file_extension)
+	save_file_button.disabled = false
+	
+	recalculate_output_chunk_positions() 
 	generate()
 
 func generate() -> void:
 	var chunks : Chunks = Chunks.get_chunks(Vector2i(chunk_width, chunk_height))
 	var image_format : Image.Format = image.get_format()
-	var output_image : Image = Image.create_empty(tile_columns * chunk_width, tile_rows * chunk_height, false, image_format)
+	output_image = Image.create_empty(tile_columns * chunk_width, tile_rows * chunk_height, false, image_format)
 	
 	blit_chunks(output_image, chunks.top_left, top_left_positions)
 	blit_chunks(output_image, chunks.top, top_positions)
@@ -329,7 +345,7 @@ func generate() -> void:
 	blit_chunks(output_image, chunks.out_bottom_left, out_bottom_left_positions)
 	blit_chunks(output_image, chunks.out_bottom_right, out_bottom_right_positions)
 	
-	$OutputPreview.texture =  ImageTexture.create_from_image(output_image)
+	output_preview.texture =  ImageTexture.create_from_image(output_image)
 
 func blit_chunks(output_image : Image, chunk_coords : Rect2i, target_coords : Array[Vector2i]) -> void:
 	for coords in target_coords:
@@ -337,3 +353,10 @@ func blit_chunks(output_image : Image, chunk_coords : Rect2i, target_coords : Ar
 
 func to_image_coords(x : int, y : int) -> Vector2i:
 	return Vector2i(x * chunk_width, y * chunk_height)
+
+func _on_save_file_pressed() -> void:
+	save_file_dialog.popup_centered_ratio()
+
+
+func _on_save_file_dialog_file_selected(path: String) -> void:
+	output_image.save_png(path)
